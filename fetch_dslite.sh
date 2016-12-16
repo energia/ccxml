@@ -1,10 +1,16 @@
 #!/bin/bash
 
 #./fetch_dslite.sh <path to .ccxml files>
+unamestr=`uname`
 
 echo "Fetching DSLite"
 
-dslite_dir=~/.ti/TICloudAgent/loaders/ccs_base
+if [[ "$unamestr" == 'MINGW32_NT-6.2' ]]; then
+    dslite_dir="$LOCALAPPDATA/Texas Instruments/TICloudAgent/loaders/ccs_base"
+else
+    dslite_dir=~/.ti/TICloudAgent/loaders/ccs_base
+fi
+
 
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
@@ -23,15 +29,13 @@ done
 
 echo "Packing DSLite"
 rm -r DSLite
-mkdir -p DSLite
-cp -r ${dslite_dir}/* DSLite/
+cp -r "${dslite_dir}" DSLite
 
 DSLITE_VER="$(DSLite/DebugServer/bin/DSLite help | sed -n "s/^.*version \([0-9.]*\).*/\1/p")"
 echo "DSLite version is:" ${DSLITE_VER}
 
 string="Creating archive for "
 
-unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
     echo ${string} "MacOS"
     eval "tar -cjf dslite-${DSLITE_VER}-x86_64-apple-darwin.tar.bz2 DSLite"
