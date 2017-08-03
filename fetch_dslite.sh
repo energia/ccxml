@@ -4,13 +4,30 @@
 unamestr=`uname`
 
 echo "Fetching TICloudAgent Installer"
-wget -O ticloudagent.run https://dev.ti.com/ticloudagent/getInstaller?os=linux
 
 echo "Installing TICloudagent"
-chmod u+x ticloudagent.run
-./ticloudagent.run --mode unattended --prefix $(pwd)
 
-echo -e "{\n\t\"userDataRoot\" : \"$(pwd)/TICloudAgent\"\n}" > TICloudAgent/config.json
+if [[ "$unamestr" == 'Darwin' ]]; then
+    wget -O ticloudagent.dmg https://dev.ti.com/ticloudagent/getInstaller?os=osx
+    hdiutil attach -mountpoint ./ticloudagent_install ticloudagent.dmg
+    ./ticloudagent_install/ticloudagent.app/Contents/MacOS/osx-intel --mode unattended --prefix $(pwd)
+    hdiutil detach ./ticloudagent_install
+    unset https_proxy http_proxy
+elif [[ "$unamestr" == 'Linux' ]]; then
+    wget -O ticloudagent.run https://dev.ti.com/ticloudagent/getInstaller?os=linux
+    chmod u+x ticloudagent.run
+    ./ticloudagent.run --mode unattended --prefix $(pwd)
+elif [[ "$unamestr" == 'MINGW32'* ]]; then
+    wget --no-check-certificate -O ticloudagent.exe https://dev.ti.com/ticloudagent/getInstaller?os=win
+    start //wait ./ticloudagent.exe --mode unattended --prefix $(pwd)
+fi
+
+if [[ "$unamestr" == 'MINGW32'* ]]; then
+    PWD="$(pwd -W)"
+    echo -e "{\n\t\"userDataRoot\" : \"${PWD//\//\\\\\\\\}\\\\\\TICloudAgent\"\n}"  > TICloudAgent/config.json
+else
+    echo -e "{\n\t\"userDataRoot\" : \"$(pwd)/TICloudAgent\"\n}" > TICloudAgent/config.json
+fi
 
 echo "Fetching DSLite"
 dslite_dir=$(pwd)/TICloudAgent/loaders/ccs_base
@@ -41,7 +58,7 @@ if [[ "$unamestr" == 'Darwin' ]]; then
 elif [[ "$unamestr" == 'Linux' ]]; then
     echo ${string} "Linux"
     eval "tar -cjf dslite-${DSLITE_VER}-i386-x86_64-pc-linux-gnu.tar.bz2 DSLite"
-elif [[ "$unamestr" == '*MINGW32*' ]]; then
+elif [[ "$unamestr" == 'MINGW32'* ]]; then
     echo ${string} "Windows"
     eval "zip -r dslite-${DSLITE_VER}-i686-mingw32.zip DSLite"
 fi
