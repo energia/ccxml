@@ -3,6 +3,15 @@
 #./fetch_dslite.sh <path to .ccxml files>
 unamestr=`uname`
 
+
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
+
+function ctrl_c() {
+        echo "** Trapped CTRL-C"
+        exit
+}
+
 echo "Fetching TICloudAgent Installer"
 
 echo "Installing TICloudagent"
