@@ -3,6 +3,8 @@
 #./fetch_dslite.sh <path to .ccxml files>
 unamestr=`uname`
 
+server=btcloudstaging.toro.design.ti.com
+#server=dev.ti.com
 
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
@@ -12,22 +14,22 @@ function ctrl_c() {
         exit
 }
 
-echo "Fetching TICloudAgent Installer"
+echo "Fetching TICloudAgent Installer from server ${server}"
 
 echo "Installing TICloudagent"
 
+    unset https_proxy http_proxy
 if [[ "$unamestr" == 'Darwin' ]]; then
-    wget -O ticloudagent.dmg https://dev.ti.com/ticloudagent/getInstaller?os=osx
+    wget --no-check-certificate -O ticloudagent.dmg https://${server}/ticloudagent/getInstaller?os=osx
     hdiutil attach -mountpoint ./ticloudagent_install ticloudagent.dmg
     ./ticloudagent_install/ticloudagent.app/Contents/MacOS/osx-intel --mode unattended --prefix $(pwd)
     hdiutil detach ./ticloudagent_install
-    unset https_proxy http_proxy
 elif [[ "$unamestr" == 'Linux' ]]; then
-    wget -O ticloudagent.run https://dev.ti.com/ticloudagent/getInstaller?os=linux
+    wget --no-check-certificate -O ticloudagent.run https://${server}/ticloudagent/getInstaller?os=linux
     chmod u+x ticloudagent.run
     ./ticloudagent.run --mode unattended --prefix $(pwd)
 elif [[ "$unamestr" == 'MINGW32'* ]]; then
-    wget --no-check-certificate -O ticloudagent.exe https://dev.ti.com/ticloudagent/getInstaller?os=win
+    wget --no-check-certificate -O ticloudagent.exe https://${server}/ticloudagent/getInstaller?os=win
     start //wait ./ticloudagent.exe --mode unattended --prefix $(pwd)
 fi
 
@@ -37,6 +39,8 @@ if [[ "$unamestr" == 'MINGW32'* ]]; then
 else
     echo -e "{\n\t\"userDataRoot\" : \"$(pwd)/TICloudAgent\"\n}" > TICloudAgent/config.json
 fi
+
+read -n 1 -s -r -p "Please edit installer.js and then press any key to continue"
 
 echo "Fetching DSLite"
 dslite_dir=$(pwd)/TICloudAgent/loaders/ccs_base
@@ -48,7 +52,7 @@ printf '%d ccxml files found\n' "${#files[@]}"
 
 for f in "${files[@]}"; do
   printf 'processing %s\n' "${f}"
-  $(pwd)/TICloudAgent/node $(pwd)/TICloudAgent/src/installer/cli.js --host https://dev.ti.com --offline 1 --target ${f}
+  $(pwd)/TICloudAgent/node $(pwd)/TICloudAgent/src/installer/cli.js --host https://${server} --offline 1 --target ${f}
 done
 
 echo "Packing DSLite"
