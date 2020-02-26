@@ -60,7 +60,6 @@ rm -r DSLite
 cp -r "${dslite_dir}" DSLite
 cp *.ccxml DSLite/
 
-cp firmware.bin DSLite/common/uscif/xds110/
 DSLITE_VER="$(DSLite/DebugServer/bin/DSLite help | sed -n "s/^.*version \([0-9.]*\).*/\1/p")"
 DSLITE_VER="${DSLITE_VER}-e1"
 echo "DSLite version is:" ${DSLITE_VER}
