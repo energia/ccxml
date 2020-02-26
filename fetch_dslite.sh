@@ -3,8 +3,8 @@
 #./fetch_dslite.sh <path to .ccxml files>
 unamestr=`uname`
 
-server=btcloudstaging.toro.design.ti.com
-#server=dev.ti.com
+#server=btcloudstaging.toro.design.ti.com
+server=dev.ti.com
 
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
