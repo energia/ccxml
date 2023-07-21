@@ -22,7 +22,7 @@ echo "Installing TICloudagent"
 if [[ "$unamestr" == 'Darwin' ]]; then
     wget --no-check-certificate -O ticloudagent.dmg https://${server}/ticloudagent/getInstaller?os=osx
     hdiutil attach -mountpoint ./ticloudagent_install ticloudagent.dmg
-    ./ticloudagent_install/ticloudagent.app/Contents/MacOS/osx-intel --mode unattended --prefix $(pwd)
+    ./ticloudagent_install/ticloudagent.app/Contents/MacOS/osx-x86_64 --mode unattended --prefix $(pwd)
     hdiutil detach ./ticloudagent_install
 elif [[ "$unamestr" == 'Linux' ]]; then
     wget --no-check-certificate -O ticloudagent.run https://${server}/ticloudagent/getInstaller?os=linux
